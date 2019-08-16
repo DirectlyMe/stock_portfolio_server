@@ -1,0 +1,14 @@
+/home/jack/dev/web/stock_portfolio_server/bin/Debug/netcoreapp2.2/stock_portfolio_server.deps.json
+/home/jack/dev/web/stock_portfolio_server/bin/Debug/netcoreapp2.2/stock_portfolio_server.runtimeconfig.json
+/home/jack/dev/web/stock_portfolio_server/bin/Debug/netcoreapp2.2/stock_portfolio_server.runtimeconfig.dev.json
+/home/jack/dev/web/stock_portfolio_server/bin/Debug/netcoreapp2.2/stock_portfolio_server.dll
+/home/jack/dev/web/stock_portfolio_server/bin/Debug/netcoreapp2.2/stock_portfolio_server.pdb
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.csprojAssemblyReference.cache
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.csproj.CoreCompileInputs.cache
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.RazorAssemblyInfo.cache
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.RazorAssemblyInfo.cs
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.AssemblyInfoInputs.cache
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.AssemblyInfo.cs
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.RazorTargetAssemblyInfo.cache
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.dll
+/home/jack/dev/web/stock_portfolio_server/obj/Debug/netcoreapp2.2/stock_portfolio_server.pdb
