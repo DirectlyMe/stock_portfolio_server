@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace stock_portfolio_server.Migrations
 {
-    public partial class Initial : Migration
+    public partial class TokenUser : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -40,7 +40,8 @@ namespace stock_portfolio_server.Migrations
                     TwoFactorEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     LockoutEnabled = table.Column<bool>(nullable: false),
-                    AccessFailedCount = table.Column<int>(nullable: false)
+                    AccessFailedCount = table.Column<int>(nullable: false),
+                    Token = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -153,6 +154,26 @@ namespace stock_portfolio_server.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "RobinhoodUsers",
+                columns: table => new
+                {
+                    userId = table.Column<string>(nullable: false),
+                    username = table.Column<string>(nullable: true),
+                    password = table.Column<string>(nullable: true),
+                    mfa = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RobinhoodUsers", x => x.userId);
+                    table.ForeignKey(
+                        name: "FK_RobinhoodUsers_AspNetUsers_userId",
+                        column: x => x.userId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -189,6 +210,11 @@ namespace stock_portfolio_server.Migrations
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Token",
+                table: "AspNetUsers",
+                column: "Token");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -207,6 +233,9 @@ namespace stock_portfolio_server.Migrations
 
             migrationBuilder.DropTable(
                 name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "RobinhoodUsers");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

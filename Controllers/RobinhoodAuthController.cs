@@ -1,14 +1,16 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using stock_portfolio_server.Models;
 
 namespace stock_portfolio_server.Controllers
 {
-    [Route("api/[controller]")]
+    [Authorize]
     [ApiController]
+    [Route("api/[controller]")]
     public class RobinhoodAuthController : Controller
     {
         private string baseUrl = "https://api.robinhood.com";
@@ -21,7 +23,7 @@ namespace stock_portfolio_server.Controllers
         }
 
         [HttpPost()]
-        public async Task<IActionResult> Post([FromBody] User user)
+        public async Task<IActionResult> Post([FromBody] RobinhoodUser user)
         {
             var payload = new Dictionary<string, string>
             {
@@ -34,6 +36,9 @@ namespace stock_portfolio_server.Controllers
             };
 
             var authorizedUser = await AuthorizeUser(payload);
+            if (authorizedUser.access_token == null) 
+                return BadRequest(new { error = "Invalid credentials" });
+                
             return Json(authorizedUser);
         }
 

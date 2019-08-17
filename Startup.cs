@@ -11,6 +11,9 @@ using stock_portfolio_server.Models;
 using stock_portfolio_server.services;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using System.Text;
 
 namespace stock_portfolio_server
 {
@@ -39,7 +42,7 @@ namespace stock_portfolio_server
             });
 
             var migrationAssembly = typeof(Startup).GetTypeInfo().Assembly.GetName().Name;
-            services.AddDbContext<IdentityDbContext>(
+            services.AddDbContext<UserDbContext>(
                 options => options.UseMySql(_configuration.GetConnectionString("localhost"),
                 mySqlOptions =>
                 {
@@ -48,12 +51,35 @@ namespace stock_portfolio_server
                 }
             ));
 
-            services.AddIdentity<IdentityUser, IdentityRole>(options => { })
-                    .AddEntityFrameworkStores<IdentityDbContext>();
-            services.AddScoped<IUserStore<IdentityUser>, UserOnlyStore<IdentityUser, IdentityDbContext>>();
+            services.AddIdentity<User, IdentityRole>(options => { })
+                    .AddEntityFrameworkStores<UserDbContext>();
+            services.AddScoped<IUserStore<User>, UserOnlyStore<User, UserDbContext>>();
+            services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User>>();
             services.AddMvc();
             services.AddHttpClient();
-            services.AddAuthentication("cookies").AddCookie("cookies", options => options.LoginPath = "/generalauth/Login");
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/generalauth/login");
+
+            var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("secret"));
+            services.AddAuthentication(x =>
+            {
+                x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(x =>
+            {
+                x.RequireHttpsMetadata = false;
+                x.SaveToken = true;
+                x.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
+            // configure DI for application services
+            services.AddScoped<IUserService, UserService>();
         }
 
         private void UserOnlyStore<T>()
