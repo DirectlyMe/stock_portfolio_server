@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace stock_portfolio_server.Migrations
 {
-    public partial class TokenUser : Migration
+    public partial class ExternalAccount : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -155,23 +155,25 @@ namespace stock_portfolio_server.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RobinhoodUsers",
+                name: "ExternalAccounts",
                 columns: table => new
                 {
-                    userId = table.Column<string>(nullable: false),
-                    username = table.Column<string>(nullable: true),
-                    password = table.Column<string>(nullable: true),
-                    mfa = table.Column<string>(nullable: true)
+                    accountId = table.Column<int>(type: "int(11)", nullable: false)
+                        .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
+                    userId = table.Column<string>(type: "varchar(150)", nullable: true),
+                    username = table.Column<string>(type: "varchar(150)", nullable: true),
+                    password = table.Column<string>(type: "varchar(150)", nullable: true),
+                    type = table.Column<string>(type: "varchar(150)", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RobinhoodUsers", x => x.userId);
+                    table.PrimaryKey("PRIMARY", x => x.accountId);
                     table.ForeignKey(
-                        name: "FK_RobinhoodUsers_AspNetUsers_userId",
+                        name: "FK_ExternalAccounts_AspNetUsers_userId",
                         column: x => x.userId,
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -215,6 +217,11 @@ namespace stock_portfolio_server.Migrations
                 name: "IX_AspNetUsers_Token",
                 table: "AspNetUsers",
                 column: "Token");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ExternalAccounts_userId",
+                table: "ExternalAccounts",
+                column: "userId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -235,7 +242,7 @@ namespace stock_portfolio_server.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "RobinhoodUsers");
+                name: "ExternalAccounts");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

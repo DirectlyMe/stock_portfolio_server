@@ -2,15 +2,17 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using stock_portfolio_server.services;
 
 namespace stock_portfolio_server.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    partial class UserDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190821224628_ExternalAccount")]
+    partial class ExternalAccount
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -124,25 +126,6 @@ namespace stock_portfolio_server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("stock_portfolio_server.Models.AccountType", b =>
-                {
-                    b.Property<int>("typeId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnName("typeId");
-
-                    b.Property<string>("name")
-                        .HasColumnName("name");
-
-                    b.HasKey("typeId")
-                        .HasName("PRIMARY");
-
-                    b.HasIndex("name");
-
-                    b.HasIndex("typeId");
-
-                    b.ToTable("AccountType");
-                });
-
             modelBuilder.Entity("stock_portfolio_server.Models.ExternalAccount", b =>
                 {
                     b.Property<int>("accountId")
@@ -154,7 +137,9 @@ namespace stock_portfolio_server.Migrations
                         .HasColumnName("password")
                         .HasColumnType("varchar(150)");
 
-                    b.Property<int?>("typeId");
+                    b.Property<string>("type")
+                        .HasColumnName("type")
+                        .HasColumnType("varchar(150)");
 
                     b.Property<string>("userId")
                         .HasColumnName("userId")
@@ -166,10 +151,6 @@ namespace stock_portfolio_server.Migrations
 
                     b.HasKey("accountId")
                         .HasName("PRIMARY");
-
-                    b.HasIndex("accountId");
-
-                    b.HasIndex("typeId");
 
                     b.HasIndex("userId");
 
@@ -277,10 +258,6 @@ namespace stock_portfolio_server.Migrations
 
             modelBuilder.Entity("stock_portfolio_server.Models.ExternalAccount", b =>
                 {
-                    b.HasOne("stock_portfolio_server.Models.AccountType", "type")
-                        .WithMany()
-                        .HasForeignKey("typeId");
-
                     b.HasOne("stock_portfolio_server.Models.User", "user")
                         .WithMany("externalAccounts")
                         .HasForeignKey("userId");

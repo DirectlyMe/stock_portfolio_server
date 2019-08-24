@@ -9,8 +9,8 @@ using stock_portfolio_server.services;
 namespace stock_portfolio_server.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20190817032119_TokenUser")]
-    partial class TokenUser
+    [Migration("20190824224525_ProductTypeTable")]
+    partial class ProductTypeTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -126,19 +126,56 @@ namespace stock_portfolio_server.Migrations
                     b.ToTable("AspNetUserTokens");
                 });
 
-            modelBuilder.Entity("stock_portfolio_server.Models.RobinhoodUser", b =>
+            modelBuilder.Entity("stock_portfolio_server.Models.AccountType", b =>
                 {
-                    b.Property<string>("userId");
+                    b.Property<int>("typeId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("typeId");
 
-                    b.Property<string>("mfa");
+                    b.Property<string>("name")
+                        .HasColumnName("name");
 
-                    b.Property<string>("password");
+                    b.HasKey("typeId")
+                        .HasName("PRIMARY");
 
-                    b.Property<string>("username");
+                    b.HasIndex("name");
 
-                    b.HasKey("userId");
+                    b.HasIndex("typeId");
 
-                    b.ToTable("RobinhoodUsers");
+                    b.ToTable("AccountType");
+                });
+
+            modelBuilder.Entity("stock_portfolio_server.Models.ExternalAccount", b =>
+                {
+                    b.Property<int>("accountId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnName("accountId")
+                        .HasColumnType("int(11)");
+
+                    b.Property<string>("password")
+                        .HasColumnName("password")
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<int?>("typeId");
+
+                    b.Property<string>("userId")
+                        .HasColumnName("userId")
+                        .HasColumnType("varchar(150)");
+
+                    b.Property<string>("username")
+                        .HasColumnName("username")
+                        .HasColumnType("varchar(150)");
+
+                    b.HasKey("accountId")
+                        .HasName("PRIMARY");
+
+                    b.HasIndex("accountId");
+
+                    b.HasIndex("typeId");
+
+                    b.HasIndex("userId");
+
+                    b.ToTable("ExternalAccounts");
                 });
 
             modelBuilder.Entity("stock_portfolio_server.Models.User", b =>
@@ -240,12 +277,15 @@ namespace stock_portfolio_server.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("stock_portfolio_server.Models.RobinhoodUser", b =>
+            modelBuilder.Entity("stock_portfolio_server.Models.ExternalAccount", b =>
                 {
-                    b.HasOne("stock_portfolio_server.Models.User")
-                        .WithOne()
-                        .HasForeignKey("stock_portfolio_server.Models.RobinhoodUser", "userId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                    b.HasOne("stock_portfolio_server.Models.AccountType", "type")
+                        .WithMany()
+                        .HasForeignKey("typeId");
+
+                    b.HasOne("stock_portfolio_server.Models.User", "user")
+                        .WithMany("externalAccounts")
+                        .HasForeignKey("userId");
                 });
 #pragma warning restore 612, 618
         }

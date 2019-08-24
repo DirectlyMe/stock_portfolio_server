@@ -16,6 +16,7 @@ namespace stock_portfolio_server.services
         Task<User> Authenticate(string username, string password);
         Task<string> Register(string username, string password);
         IEnumerable<User> GetAll();
+        string GetUserId(ClaimsPrincipal user);
     }
 
     public class UserService : IUserService
@@ -83,10 +84,18 @@ namespace stock_portfolio_server.services
             return null;
         }
 
+        public string GetUserId(ClaimsPrincipal user)
+        {
+            var claimsIdentity = user.Identity as ClaimsIdentity;
+            return claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+        }
+
         public IEnumerable<User> GetAll()
         {
             throw new System.NotImplementedException();
         }
+
+
 
     }
 }
