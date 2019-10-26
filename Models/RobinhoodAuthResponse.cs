@@ -1,8 +1,7 @@
 namespace stock_portfolio_server.Models
 {
-    public class RobinhoodAuthResponse
+    public class RobinhoodAuthResponse : AuthResponse
     {
-        public string access_token;
         public string expires_in;
         public string token_type;
         public string scope;

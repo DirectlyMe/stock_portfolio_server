@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,35 +23,38 @@ namespace stock_portfolio_server.Controllers
         [HttpPost("authenticate")]
         public async Task<IActionResult> Authenticate([FromBody] LoginModel userParam)
         {
-            if (ModelState.IsValid){
+            if (!ModelState.IsValid)
+                return StatusCode(304);
+
+            try
+            {
                 var user = await _userService.Authenticate(userParam.UserName, userParam.Password);
-
-                if (user == null)
-                    return BadRequest(new { error = "Username or password is incorrect" });
-
                 return Ok(user);
             }
-
-            return StatusCode(304);
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = "Username or password is incorrect", exception = ex });
+            }
         }
-        
+
         [AllowAnonymous]
         [HttpPost("register")]
         // [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register([FromBody] RegisterModel model)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
+                return BadRequest(new { error = "Model not valid" });
+
+            try 
             {
-                var errors = await _userService.Register(model.UserName, model.Password);
+                var user = await _userService.Register(model.UserName, model.Password);
 
-                if (errors == null) {
-                    return Ok(new { message = "registration successful" });
-                }
-
-                return BadRequest(new { error = errors });
+                return Ok(new { message = "registration successful", user });
             }
-
-            return StatusCode(304);
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
         }
     }
 }

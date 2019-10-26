@@ -1,4 +1,6 @@
+using System;
 using System.Threading.Tasks;
+using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using stock_portfolio_server.services;
@@ -12,10 +14,10 @@ namespace stock_portfolio_server.Controllers
     public class ExternalAccounts : Controller
     {
         private readonly UserDbContext _userContext;
-        private readonly UserService _userService;
-        private readonly AccountService _accountService;
+        private readonly IUserService _userService;
+        private readonly IAccountService _accountService;
 
-        public ExternalAccounts(UserDbContext userContext, UserService userService, AccountService accountService)
+        public ExternalAccounts(UserDbContext userContext, IUserService userService, IAccountService accountService)
         {
             _userContext = userContext;
             _userService = userService;
@@ -27,29 +29,35 @@ namespace stock_portfolio_server.Controllers
         {
             var accounts = await _accountService.GetAccounts(_userService.GetUserId(this.User));
 
-            return Ok(accounts);
+            return Ok(new { accounts = accounts });
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateExternalAccount(ExternalAccountView account)
+        public async Task<IActionResult> CreateExternalAccount([FromBody] ExternalAccountSubmittionView account)
         {
-            if (ModelState.IsValid)
+            try
             {
+                if (!ModelState.IsValid)
+                    throw new Exception("data sent is not valid");
+
+                var existingAccounts = await _accountService.GetAccounts(_userService.GetUserId(this.User));
+
+                if(existingAccounts.Exists(acct => acct.type.name == account.type))
+                    throw new Exception($"Account already exists for this {this.User}");
+
                 var newAccount = await _accountService.CreateAccount(
-                    account.username, 
-                    account.password, 
-                    account.type, 
+                    account.username,
+                    account.password,
+                    account.type,
                     _userService.GetUserId(this.User)
                 );
+                
 
-                if (newAccount == null)
-                    return BadRequest(new { error = "account creation failed" });
-                else
-                    return Ok(new { success = "account created" });
+                return Ok(new { success = "account created" });
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest(new { error = "data sent is not valid" });
+                return BadRequest(new { error = ex.Message });
             }
         }
     }

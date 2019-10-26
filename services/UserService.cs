@@ -14,7 +14,7 @@ namespace stock_portfolio_server.services
     public interface IUserService
     {
         Task<User> Authenticate(string username, string password);
-        Task<string> Register(string username, string password);
+        Task<User> Register(string username, string password);
         IEnumerable<User> GetAll();
         string GetUserId(ClaimsPrincipal user);
     }
@@ -34,54 +34,52 @@ namespace stock_portfolio_server.services
         {
             var user = await _userManager.FindByNameAsync(userName);
 
-            if (user != null && await _userManager.CheckPasswordAsync(user, password))
+            await _userManager.CheckPasswordAsync(user, password);
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("secret"));
+            var tokenDescriptor = new SecurityTokenDescriptor
             {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("secret"));
-                var tokenDescriptor = new SecurityTokenDescriptor
+                Subject = new ClaimsIdentity(new Claim[]
                 {
-                    Subject = new ClaimsIdentity(new Claim[]
-                    {
                         new Claim(ClaimTypes.Name, user.Id.ToString())
-                    }),
-                    Expires = DateTime.UtcNow.AddDays(7),
-                    SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
-                };
-                var token = tokenHandler.CreateToken(tokenDescriptor);
-                user.Token = tokenHandler.WriteToken(token);
+                }),
+                Expires = DateTime.UtcNow.AddDays(7),
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
 
-                return user;
-            }
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            user.Token = tokenHandler.WriteToken(token);
 
-            return null;
+            return user;
         }
 
-        public async Task<string> Register(string userName, string password)
+        public async Task<User> Register(string userName, string password)
         {
             var user = await _userManager.FindByNameAsync(userName);
 
-            if (user == null)
+            if (user != null)
+                throw new Exception("User already exists");
+            
+            user = new User
             {
-                user = new User
-                {
-                    Id = Guid.NewGuid().ToString(),
-                    UserName = userName,
-                };
-                var result = await _userManager.CreateAsync(user, password);
+                Id = Guid.NewGuid().ToString(),
+                UserName = userName,
+            };
+            var result = await _userManager.CreateAsync(user, password);
 
-                if (result.Errors != null)
+            if (result.Errors != null)
+            {
+                var errorString = new StringBuilder();
+                foreach (var error in result.Errors)
                 {
-                    var errorString = new StringBuilder();
-                    foreach (var error in result.Errors)
-                    {
-                        errorString.Append(error.Description);
-                    }
-
-                    return errorString.ToString();
+                    errorString.Append(error.Description);
                 }
+
+                throw new Exception(errorString.ToString());
             }
 
-            return null;
+            return user;
         }
 
         public string GetUserId(ClaimsPrincipal user)

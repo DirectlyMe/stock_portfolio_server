@@ -21,7 +21,7 @@ namespace stock_portfolio_server
     {
 
         private readonly IConfiguration _configuration;
-        private const string _myAllowSpecificOrigins = "_myAllowSpecificOrigins";
+        private const string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 
         public Startup(IConfiguration configuration)
         {
@@ -32,7 +32,7 @@ namespace stock_portfolio_server
         {
             services.AddCors(options =>
             {
-                options.AddPolicy(_myAllowSpecificOrigins,
+                options.AddPolicy(MyAllowSpecificOrigins,
                     builder =>
                     {
                         builder.WithOrigins("http://192.168.1.131:3000", "http://localhost:3000", "http://localhost:3001")
@@ -50,6 +50,14 @@ namespace stock_portfolio_server
                     mySqlOptions.MigrationsAssembly(migrationAssembly);
                 }
             ));
+
+            services.AddIdentity<User, IdentityRole>(options => { })
+                    .AddEntityFrameworkStores<UserDbContext>();
+            services.AddScoped<IUserStore<User>, UserOnlyStore<User, UserDbContext>>();
+            services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User>>();
+            services.AddMvc();
+            services.AddHttpClient();
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/generalauth/login");
 
             var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("secret"));
             services.AddAuthentication(x =>
@@ -70,16 +78,14 @@ namespace stock_portfolio_server
                 };
             });
 
-            services.AddIdentity<User, IdentityRole>(options => { })
-                    .AddEntityFrameworkStores<UserDbContext>();
-            services.AddScoped<IUserStore<User>, UserOnlyStore<User, UserDbContext>>();
-            services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User>>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountService, AccountService>();
-            services.AddMvc();
-            services.AddHttpClient();
         }
 
+        private void UserOnlyStore<T>()
+        {
+            throw new NotImplementedException();
+        }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -90,7 +96,7 @@ namespace stock_portfolio_server
             }
 
             app.UseAuthentication();
-            app.UseCors(_myAllowSpecificOrigins);
+            app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc(ConfigureRoutes);
         }
 

@@ -55,6 +55,7 @@ namespace stock_portfolio_server.services
             builder.Entity<AccountType>(accountType => {
                 accountType.HasIndex(x => x.name);
                 accountType.HasIndex(x => x.typeId);
+                accountType.HasIndex(x => x.connectionUrl);
 
                 accountType.ToTable("AccountType");
 
@@ -66,6 +67,9 @@ namespace stock_portfolio_server.services
                 
                 accountType.Property(e => e.typeId)
                            .HasColumnName("typeId");
+
+                accountType.Property(e => e.connectionUrl)
+                           .HasColumnName("connectionUrl");
             });
         }
     }

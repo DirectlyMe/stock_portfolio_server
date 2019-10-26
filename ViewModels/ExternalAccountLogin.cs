@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace stock_portfolio_server.ViewModels
 {
-    public class LoginModel
+    public class ExternalAccountLogin
     {
         public string accountTypeName { get; set; }
         public string UserName { get; set; }

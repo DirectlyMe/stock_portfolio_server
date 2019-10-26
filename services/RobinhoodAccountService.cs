@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -9,46 +10,28 @@ using Newtonsoft.Json;
 using stock_portfolio_server.Models;
 using stock_portfolio_server.services;
 
-namespace stock_portfolio_server.Controllers
+namespace stock_portfolio_server.services
 {
-    [Authorize]
-    [ApiController]
-    [Route("api/[controller]")]
-    public class RobinhoodAuthController : Controller
+    public class RobinhoodAccountService : IExternalAccountService
     {
+        public const int TYPE_ID = 1;
         private string baseUrl = "https://api.robinhood.com/";
         private string loginUrl = "/oauth2/token/";
+        private string accountsUrl = "/accounts/";
         private readonly IHttpClientFactory _clientFactory;
         public UserDbContext _userContext;
 
-        public RobinhoodAuthController(IHttpClientFactory clientFactory, UserDbContext userContext)
+        public RobinhoodAccountService(IHttpClientFactory clientFactory)
         {
             _clientFactory = clientFactory;
-            _userContext = userContext;
         }
 
-        [HttpGet]
-        public IActionResult GetCredentials()
-        {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
-
-            var robinhoodCredentials = _userContext.Users.Select(x => x.externalAccounts.Where(p => p.userId == userId));
-            return StatusCode(200);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] RobinhoodUser user)
-        {
-            var claimsIdentity = this.User.Identity as ClaimsIdentity;
-            var userId = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
-            
-            // var user = _userContext.Users.
-
+        public async Task<AuthResponse> Authorize(ExternalAccount userAccount) 
+        {            
             var payload = new Dictionary<string, string>
             {
-                { "username", user.username },
-                { "password", user.password },
+                { "username", userAccount.username },
+                { "password", userAccount.password },
                 { "client_id", "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS" },
                 { "device_token", "d13a1d4a-88cc-4db4-8b76-b7301626f70a"},
                 { "grant_type", "password" },
@@ -56,10 +39,20 @@ namespace stock_portfolio_server.Controllers
             };
 
             var authorizedUser = await AuthorizeUser(payload);
-            if (authorizedUser.Getaccess_token() == null)
-                return BadRequest(new { error = "Invalid credentials" });
+            if (authorizedUser.access_token == null)
+                throw new Exception("Authorization failed");
 
-            return Json(authorizedUser);
+            return authorizedUser;
+        }
+
+        public async void GetAccounts(string token)
+        {
+            var client = _clientFactory.CreateClient();
+
+            var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}{accountsUrl}");
+            request.Headers.Add("Authorization", $"Bearer {token}");
+
+            var response = await client.SendAsync(request);
         }
 
         private async Task<RobinhoodAuthResponse> AuthorizeUser(Dictionary<string, string> payload)
@@ -74,3 +67,4 @@ namespace stock_portfolio_server.Controllers
         }
     }
 }
+
