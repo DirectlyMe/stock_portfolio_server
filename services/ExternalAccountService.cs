@@ -7,8 +7,11 @@ namespace stock_portfolio_server.services
 {
     public interface IExternalAccountService
     {
-        public Task<AuthResponse> Authorize(ExternalAccount userAccount);
-        public void GetAccounts(string token);
+        Task<AuthResponse> Authorize(string userId, int accountId, string mfaCode);
+        Task<AuthResponse> Authorize(string userId, int accountId);
+        Task<AuthResponse> Authorize(ExternalAccount userAccount);
+        Task<AuthResponse> Authorize(ExternalAccount userAccount, string mfaCode);
+        void GetAccounts(string token);
     }
 
     public class ExternalAccountService : IExternalAccountService
@@ -22,17 +25,42 @@ namespace stock_portfolio_server.services
             _userDbContext = userDbContext;
         }
 
-        public Task<AuthResponse> Authorize(string userId, string username, string password, string accountTypeName)
+        public Task<AuthResponse> Authorize(string userId, int accountId)
         {
-            var userAccount = _userDbContext.ExternalAccount.Where(account => account.userId == userId && account.type.name == accountTypeName).First();
+            var userAccount = _userDbContext.ExternalAccount.Where(account => account.userId == userId && account.type.typeId == accountId)
+                              .First();
 
-            switch (userAccount.type.name)
+            switch (userAccount.accountId)
             {
-                case "robinhood":
+                case 1: // robinhood
                     return _robinhoodService.Authorize(userAccount);
                 default: 
-                    throw new Exception($"User doesn't have a account of type: {accountTypeName}");
+                    throw new Exception($"User doesn't have a account of type: {accountId}");
             }
+        }
+
+        public Task<AuthResponse> Authorize(string userId, int accountId, string mfaCode)
+        {
+            var userAccount = _userDbContext.ExternalAccount.Where(account => account.userId == userId && account.type.typeId == accountId)
+                              .First();
+
+            switch (userAccount.accountId)
+            {
+                case 1: // robinhood
+                    return _robinhoodService.Authorize(userAccount, mfaCode);
+                default: 
+                    throw new Exception($"User doesn't have a account of type: {accountId}");
+            }
+        }
+
+        public Task<AuthResponse> Authorize(ExternalAccount userAccount)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<AuthResponse> Authorize(ExternalAccount userAccount, string mfaCode)
+        {
+            throw new NotImplementedException();
         }
 
         public void GetAccounts(string token)

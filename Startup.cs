@@ -57,6 +57,7 @@ namespace stock_portfolio_server
             services.AddScoped<IUserClaimsPrincipalFactory<User>, UserClaimsPrincipalFactory<User>>();
             services.AddMvc();
             services.AddHttpClient();
+            services.AddSignalR();
             services.ConfigureApplicationCookie(options => options.LoginPath = "/generalauth/login");
 
             var key = Encoding.ASCII.GetBytes(_configuration.GetValue<string>("secret"));
@@ -80,6 +81,8 @@ namespace stock_portfolio_server
 
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountService, AccountService>();
+            services.AddScoped<IExternalAccountService, ExternalAccountService>();
+            services.AddScoped<RobinhoodAccountService, RobinhoodAccountService>();
         }
 
         private void UserOnlyStore<T>()
@@ -98,6 +101,7 @@ namespace stock_portfolio_server
             app.UseAuthentication();
             app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc(ConfigureRoutes);
+            a
         }
 
         private void ConfigureRoutes(IRouteBuilder routeBuilder)

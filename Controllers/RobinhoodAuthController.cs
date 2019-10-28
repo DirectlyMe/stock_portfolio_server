@@ -56,7 +56,7 @@ namespace stock_portfolio_server.Controllers
             };
 
             var authorizedUser = await AuthorizeUser(payload);
-            if (authorizedUser.Getaccess_token() == null)
+            if (authorizedUser.access_token == null)
                 return BadRequest(new { error = "Invalid credentials" });
 
             return Json(authorizedUser);

@@ -15,22 +15,28 @@ namespace stock_portfolio_server.Controllers
         private readonly UserDbContext _userContext;
         private readonly IUserService _userService;
         private readonly IAccountService _accountService;
+        private readonly IExternalAccountService _externalAcctService;
 
-        public ExternalAcctAuthController(UserDbContext userContext, IUserService userService, IAccountService accountService)
+        public ExternalAcctAuthController(UserDbContext userContext, IUserService userService, IAccountService accountService, IExternalAccountService externalAcctService)
         {
             _userContext = userContext;
             _userService = userService;
             _accountService = accountService;
+            _externalAcctService = externalAcctService;
         }
 
-        public async Task<IActionResult> AccountLogin([FromBody] ExternalAccountLogin loginModel)
+        [HttpGet("{id}")]
+        public IActionResult LoginAccount(int id) // TODO: Add mfa code param, might need to turn this into a POST method
         {
             try
             {
-                if (!ModelState.IsValid)
-                    throw new Exception("Model not valid");
+                var userId = _userService.GetUserId(this.User);
+
+                var userConnSpecs = _externalAcctService.Authorize(userId, id);
+
+                return Ok();
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 return BadRequest(new { error = ex.Message });
             }

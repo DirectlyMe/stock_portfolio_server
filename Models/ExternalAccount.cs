@@ -13,6 +13,6 @@ namespace stock_portfolio_server.Models
         public string password { get; set; }
 
         public User user { get; set; }
-        public virtual AccountType type { get; set; }
+        public AccountType type { get; set; }
     }
 }

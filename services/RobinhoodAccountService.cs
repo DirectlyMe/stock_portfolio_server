@@ -16,8 +16,8 @@ namespace stock_portfolio_server.services
     {
         public const int TYPE_ID = 1;
         private string baseUrl = "https://api.robinhood.com/";
-        private string loginUrl = "/oauth2/token/";
-        private string accountsUrl = "/accounts/";
+        private string loginUrl = "oauth2/token/";
+        private string accountsUrl = "accounts/";
         private readonly IHttpClientFactory _clientFactory;
         public UserDbContext _userContext;
 
@@ -33,13 +33,33 @@ namespace stock_portfolio_server.services
                 { "username", userAccount.username },
                 { "password", userAccount.password },
                 { "client_id", "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS" },
-                { "device_token", "d13a1d4a-88cc-4db4-8b76-b7301626f70a"},
-                { "grant_type", "password" },
-                // { "mfa_code", user.mfa }
+                { "device_token", "71bf6292-064c-4967-898c-04c1f93176f4"},
+                { "grant_type", "password" }
             };
 
             var authorizedUser = await AuthorizeUser(payload);
-            if (authorizedUser.access_token == null)
+
+            if (authorizedUser.access_token == null && authorizedUser.mfa_required == false)
+                throw new Exception("Authorization failed");
+
+            return authorizedUser;
+        }
+
+        public async Task<AuthResponse> Authorize(ExternalAccount userAccount, string mfaCode) 
+        {            
+            var payload = new Dictionary<string, string>
+            {
+                { "username", userAccount.username },
+                { "password", userAccount.password },
+                { "client_id", "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS" },
+                { "device_token", "71bf6292-064c-4967-898c-04c1f93176f4"},
+                { "grant_type", "password" },
+                { "mfa_code", mfaCode }
+            };
+
+            var authorizedUser = await AuthorizeUser(payload);
+
+            if (authorizedUser.access_token == null && authorizedUser.mfa_required == false)
                 throw new Exception("Authorization failed");
 
             return authorizedUser;
@@ -65,6 +85,15 @@ namespace stock_portfolio_server.services
 
             return robinhoodResponse;
         }
+
+        public Task<AuthResponse> Authorize(string userId, int accountId, string mfaCode)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<AuthResponse> Authorize(string userId, int accountId)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
-

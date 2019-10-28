@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/home/jack/dev/web/stock_portfolio_server/stock_portfolio_server.csproj": {}
+    "/home/jack/dev/stock_portfolio/stock_portfolio_server/stock_portfolio_server.csproj": {}
   },
   "projects": {
-    "/home/jack/dev/web/stock_portfolio_server/stock_portfolio_server.csproj": {
+    "/home/jack/dev/stock_portfolio/stock_portfolio_server/stock_portfolio_server.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/home/jack/dev/web/stock_portfolio_server/stock_portfolio_server.csproj",
+        "projectUniqueName": "/home/jack/dev/stock_portfolio/stock_portfolio_server/stock_portfolio_server.csproj",
         "projectName": "stock_portfolio_server",
-        "projectPath": "/home/jack/dev/web/stock_portfolio_server/stock_portfolio_server.csproj",
+        "projectPath": "/home/jack/dev/stock_portfolio/stock_portfolio_server/stock_portfolio_server.csproj",
         "packagesPath": "/home/jack/.nuget/packages/",
-        "outputPath": "/home/jack/dev/web/stock_portfolio_server/obj/",
+        "outputPath": "/home/jack/dev/stock_portfolio/stock_portfolio_server/obj/",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "/usr/share/dotnet/sdk/NuGetFallbackFolder"
