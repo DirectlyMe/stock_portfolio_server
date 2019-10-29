@@ -101,7 +101,6 @@ namespace stock_portfolio_server
             app.UseAuthentication();
             app.UseCors(MyAllowSpecificOrigins);
             app.UseMvc(ConfigureRoutes);
-            a
         }
 
         private void ConfigureRoutes(IRouteBuilder routeBuilder)

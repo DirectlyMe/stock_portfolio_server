@@ -45,7 +45,7 @@ namespace stock_portfolio_server.services
             return authorizedUser;
         }
 
-        public async Task<AuthResponse> Authorize(ExternalAccount userAccount, string mfaCode) 
+        public async Task<AuthResponse> Authorize(ExternalAccount userAccount, int mfaCode) 
         {            
             var payload = new Dictionary<string, string>
             {
@@ -54,7 +54,7 @@ namespace stock_portfolio_server.services
                 { "client_id", "c82SH0WZOsabOXGP2sxqcj34FxkvfnWRZBKlBjFS" },
                 { "device_token", "71bf6292-064c-4967-898c-04c1f93176f4"},
                 { "grant_type", "password" },
-                { "mfa_code", mfaCode }
+                { "mfa_code", mfaCode.ToString() }
             };
 
             var authorizedUser = await AuthorizeUser(payload);
@@ -86,7 +86,7 @@ namespace stock_portfolio_server.services
             return robinhoodResponse;
         }
 
-        public Task<AuthResponse> Authorize(string userId, int accountId, string mfaCode)
+        public Task<AuthResponse> Authorize(string userId, int accountId, int mfaCode)
         {
             throw new NotImplementedException();
         }

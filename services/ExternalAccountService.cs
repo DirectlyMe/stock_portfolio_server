@@ -7,10 +7,10 @@ namespace stock_portfolio_server.services
 {
     public interface IExternalAccountService
     {
-        Task<AuthResponse> Authorize(string userId, int accountId, string mfaCode);
+        Task<AuthResponse> Authorize(string userId, int accountId, int mfaCode);
         Task<AuthResponse> Authorize(string userId, int accountId);
         Task<AuthResponse> Authorize(ExternalAccount userAccount);
-        Task<AuthResponse> Authorize(ExternalAccount userAccount, string mfaCode);
+        Task<AuthResponse> Authorize(ExternalAccount userAccount, int mfaCode);
         void GetAccounts(string token);
     }
 
@@ -25,7 +25,7 @@ namespace stock_portfolio_server.services
             _userDbContext = userDbContext;
         }
 
-        public Task<AuthResponse> Authorize(string userId, int accountId)
+        public async Task<AuthResponse> Authorize(string userId, int accountId)
         {
             var userAccount = _userDbContext.ExternalAccount.Where(account => account.userId == userId && account.type.typeId == accountId)
                               .First();
@@ -33,13 +33,13 @@ namespace stock_portfolio_server.services
             switch (userAccount.accountId)
             {
                 case 1: // robinhood
-                    return _robinhoodService.Authorize(userAccount);
+                    return await _robinhoodService.Authorize(userAccount);
                 default: 
                     throw new Exception($"User doesn't have a account of type: {accountId}");
             }
         }
 
-        public Task<AuthResponse> Authorize(string userId, int accountId, string mfaCode)
+        public Task<AuthResponse> Authorize(string userId, int accountId, int mfaCode)
         {
             var userAccount = _userDbContext.ExternalAccount.Where(account => account.userId == userId && account.type.typeId == accountId)
                               .First();
@@ -58,7 +58,7 @@ namespace stock_portfolio_server.services
             throw new NotImplementedException();
         }
 
-        public Task<AuthResponse> Authorize(ExternalAccount userAccount, string mfaCode)
+        public Task<AuthResponse> Authorize(ExternalAccount userAccount, int mfaCode)
         {
             throw new NotImplementedException();
         }

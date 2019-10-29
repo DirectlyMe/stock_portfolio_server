@@ -26,15 +26,32 @@ namespace stock_portfolio_server.Controllers
         }
 
         [HttpGet("{id}")]
-        public IActionResult LoginAccount(int id) // TODO: Add mfa code param, might need to turn this into a POST method
+        public async Task<IActionResult> LoginAccount(int id) // TODO: Add mfa code param, might need to turn this into a POST method
         {
             try
             {
                 var userId = _userService.GetUserId(this.User);
 
-                var userConnSpecs = _externalAcctService.Authorize(userId, id);
+                var userConnSpecs = await _externalAcctService.Authorize(userId, id);
 
-                return Ok();
+                return Ok(userConnSpecs);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+        [HttpGet("{id}/{mfa}")]
+        public async Task<IActionResult> LoginAccountMfa(int id, int mfa) 
+        {
+            try
+            {
+                var userId = _userService.GetUserId(this.User);
+
+                var userConnSpecs = await _externalAcctService.Authorize(userId, id, mfa);
+
+                return Ok(userConnSpecs);
             }
             catch (Exception ex)
             {
