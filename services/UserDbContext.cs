@@ -71,6 +71,23 @@ namespace stock_portfolio_server.services
                 accountType.Property(e => e.connectionUrl)
                            .HasColumnName("connectionUrl");
             });
+
+            builder.Entity<Stock>(stock => {
+                stock.HasIndex(x => x.StockId);
+                stock.HasIndex(x => x.Symbol);
+
+                stock.ToTable("UserStocks");
+
+                stock.HasKey(x => x.StockId)
+                     .HasName("PRIMARY");
+
+                stock.Property(x => x.Symbol)
+                     .HasColumnName("symbol");
+
+                stock.HasOne(e => e.user)
+                     .WithMany(b => b.userStocks)
+                     .HasForeignKey(p => p.userId);
+            });
         }
     }
 }

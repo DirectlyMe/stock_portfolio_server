@@ -26,7 +26,7 @@ namespace stock_portfolio_server.Controllers
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> LoginAccount(int id) // TODO: Add mfa code param, might need to turn this into a POST method
+        public async Task<IActionResult> LoginAccount(int id)
         {
             try
             {

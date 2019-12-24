@@ -7,5 +7,6 @@ namespace stock_portfolio_server.Models
     {
         public string Token { get; set; }
         public virtual List<ExternalAccount> externalAccounts { get; set; }
+        public virtual List<Stock> userStocks { get; set; }
     }
 }

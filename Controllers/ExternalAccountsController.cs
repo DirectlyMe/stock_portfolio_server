@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using stock_portfolio_server.services;
 using stock_portfolio_server.ViewModels;
+using System.Security.Claims;
 
 namespace stock_portfolio_server.Controllers
 {
@@ -27,7 +28,10 @@ namespace stock_portfolio_server.Controllers
         [HttpGet]
         public async Task<IActionResult> GetExternalAccounts()
         {
-            var accounts = await _accountService.GetAccounts(_userService.GetUserId(this.User));
+            var claimsIdentity = this.User.Identity as ClaimsIdentity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.Name)?.Value;
+            
+            var accounts = await _accountService.GetAccounts(userId);
 
             return Ok(new { accounts = accounts });
         }
