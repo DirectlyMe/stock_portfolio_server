@@ -12,6 +12,7 @@ namespace stock_portfolio_server.services
         }
 
         public virtual DbSet<ExternalAccount> ExternalAccount { get; set; }
+        public virtual DbSet<Stock> Stocks { get; set; }
         public virtual DbSet<AccountType> AccountType { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)

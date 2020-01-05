@@ -82,6 +82,7 @@ namespace stock_portfolio_server
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IAccountService, AccountService>();
             services.AddScoped<IExternalAccountService, ExternalAccountService>();
+            services.AddScoped<IStockQueryService, StockQueryServices>();
             services.AddScoped<RobinhoodAccountService, RobinhoodAccountService>();
         }
 
